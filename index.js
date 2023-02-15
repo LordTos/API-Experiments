@@ -35,8 +35,14 @@ const controller = {
     }
 }
 
-//Comentátio aqui
+// Rota para GET → getAll() → Recebe, por exemplo, todos os registros.
 app.get('/', controller.resJson);
+
+// Rota para GET → get(id) → Recebe apenas o registro identificado.
+app.get('/:id', controller.resJson);
+
+//Rota para DELETE.
+app.delete('/:id', contreller.resJson);
 
 //Comentátio aqui
 app.listen(port, () => {
