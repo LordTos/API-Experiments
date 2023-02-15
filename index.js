@@ -36,11 +36,7 @@ const controller = {
 }
 
 //Comentátio aqui
-app.get('/', (req,res) => {
-
-    //Comentátio aqui
-    res.send('Biel next instrutor')
-})
+app.get('/', controller.resJson);
 
 //Comentátio aqui
 app.listen(port, () => {
