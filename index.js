@@ -35,6 +35,9 @@ const controller = {
     }
 }
 
+// Recebe os dados do body HTTP e valida em JSON.
+const bodyParser = require('body-parser').json();
+
 // Rota para GET → getAll() → Recebe, por exemplo, todos os registros.
 app.get('/', controller.resJson);
 
@@ -43,6 +46,12 @@ app.get('/:id', controller.resJson);
 
 //Rota para DELETE.
 app.delete('/:id', controller.resJson);
+
+// Rota para POST → bodyParser (no hook) é usado para garantir a chegada de um JSON.
+app.post('/', bodyParser, controller.resJson);
+
+// Rota para PUT → bodyParser (no hook) é usado para garantir a chegada de um JSON.
+app.put('/:id', bodyParser, controller.resJson);
 
 //Comentátio aqui
 app.listen(port, () => {
