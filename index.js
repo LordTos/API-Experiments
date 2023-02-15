@@ -14,7 +14,7 @@ const port = conf.HTTPPORT;
 
 //Objeto que será executado quando houver uma requisição.
 const controller = {
-    ressJson: async (req, res) =>{
+    resJson: async (req, res) =>{
 
         //Lista com alguns atributos uteis da requisição (req) HTTP.
         data = {
@@ -42,7 +42,7 @@ app.get('/', controller.resJson);
 app.get('/:id', controller.resJson);
 
 //Rota para DELETE.
-app.delete('/:id', contreller.resJson);
+app.delete('/:id', controller.resJson);
 
 //Comentátio aqui
 app.listen(port, () => {
