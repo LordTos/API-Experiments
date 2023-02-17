@@ -3,11 +3,23 @@
 //Comentátio aqui
 const express = require('express')
 
-const conf = require('dotenv').config().parsed;
-console.log(conf);
-
 //Comentátio aqui
 const app = express()
+
+const conf = require('dotenv').config().parsed;
+//console.log(conf);
+
+//Importa a biblioteca "MySQL"
+const mysql = require('mysql12');
+
+//Faz a conexão com o servidor.
+const conn = mysql.createPool({
+  host: conf.HOSTNAME,
+  user: conf.USERNAME,
+  database: conf.DATABASE,
+  password: conf.PASSWORD,
+  port: conf.HOSTPORT
+}).promise();
 
 //Comentátio aqui
 const port = conf.HTTPPORT;
@@ -15,22 +27,75 @@ const port = conf.HTTPPORT;
 // Objeto que será executado quando houver uma requisição.
 const thing = {
     getAll: async (req, res) => {
-      res.json({ "req": req.method, "status": "ok" });
+
+      try{
+        
+        // Query que obtém os dados do banco de dados.
+      const sql = "SELECT *, DATE_FORMAT(tdate, '%d/%m/%Y às %H:%i') AS tdatebr FROM things WHERE tstatus = 'on' ORDER BY tdate DESC";
+      const [rows] = await conn.query(sql);
+
+      // View dos dados.
+      res.json({ data: rows });
+
+      }
+      catch(error){
+
+        // Exibe mensagem de erro.
+      res.json({ status: "error", message: error });
+
+      }
+      
     },
     getOne: async (req, res) => {
-      const id = req.params.id;
-      res.json({ "req": req.method, "id": id, "status": "ok" });
+      try {
+
+        // Id da requisição
+        const id = req.params.id;
+  
+        const sql = "SELECT *, DATE_FORMAT(tdate, '%d/%m/%Y às %H:%i') AS tdatebr FROM things WHERE tid = ? AND tstatus = 'on' ORDER BY tdate DESC";
+        const [rows] = await conn.query(sql, [id]);
+  
+        // View dos dados.
+        res.json({ coisa: rows });
+  
+      } catch (error) {
+  
+        // Exibe mensagem de erro.
+        res.json({ status: "error", message: error });
+  
+      }
     },
     post: async (req, res) => {
-      res.json({ "req": req.method, "status": "ok" });
+      
+      try {
+
+        // Extrai os campos do req.body.
+        const { user, name, photo, description, location, options } = req.body;
+  
+        // Query.
+        const sql = "INSERT INTO things (tuser, tname, tphoto, tdescription, tlocation, toptions) VALUES (?, ?, ?, ?, ?, ?)";
+        const [rows] = await conn.query(sql, [user, name, photo, description, location, options]);
+  
+        // View dos dados.
+        res.json({ coisa: rows.insertId, status: "sucess" });
+  
+      } catch (error) {
+  
+        // Exibe mensagem de erro.
+        res.json({ status: "error", message: error });
+  
+      }
      },
+
     put: async (req, res) => {
-        const id = req.params.id; 
-      res.json({ "req": req.method, "id":id, "status": "ok" });
+      try{
+        
+      }catch(error){}
     },
+
     delete: async (req, res) => {
         const id = req.params.id;
-        res.json({ "req": req.method, "id": id, "status": "ok" });;
+        res.json({ "req": req.method, "id": req.params.id, "status": "ok" });;
      }
   }
 
