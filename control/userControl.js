@@ -101,6 +101,6 @@ const userControl = {
 module.exports = userControl;
 
 /**
- * By Luferat 2023
+ * By LordTos 2023
  * MIT Licensed
  */

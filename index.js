@@ -27,6 +27,6 @@ app.listen(port, () => {
 });
 
 /**
- * By Luferat 2023
+ * By LordTos 2023
  * MIT Licensed
  */

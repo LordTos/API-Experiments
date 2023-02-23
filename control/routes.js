@@ -44,6 +44,6 @@ router.delete("/user/:id", userControl.delete);
 module.exports = router;
 
 /**
- * By Luferat 2023
+ * By LordTos 2023
  * MIT Licensed
  */
