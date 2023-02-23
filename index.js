@@ -1,18 +1,14 @@
-
-// Atividade comentar cada linha do código, resumo de cada linha do código.
-//Comentátio aqui
+// Inicializa Express.
 const express = require('express')
-
-//Comentátio aqui
 const app = express()
 
+// Obtém configurações de ".env".
 const conf = require('dotenv').config().parsed;
-//console.log(conf);
 
-//Importa a biblioteca "MySQL"
+// Importa a biblioteca de conexão ao "MySQL".
 const mysql = require('mysql2');
 
-//Faz a conexão com o servidor.
+// Faz a conexão com o servidor "MySQL".
 const conn = mysql.createPool({
   host: conf.HOSTNAME,
   user: conf.USERNAME,
@@ -21,93 +17,151 @@ const conn = mysql.createPool({
   port: conf.HOSTPORT
 }).promise();
 
-//Comentátio aqui
-const port = conf.HTTPPORT;
+// Define a porta padrão do HTTP.
+const port = conf.HTTPPORT || 3000;
 
 // Objeto que será executado quando houver uma requisição.
 const thing = {
-    getAll: async (req, res) => {
 
-      try{
-        
-        // Query que obtém os dados do banco de dados.
+  getAll: async (req, res) => {
+
+    try {
+
+      // Executa query que obtém todos os registros.
       const sql = "SELECT *, DATE_FORMAT(tdate, '%d/%m/%Y às %H:%i') AS tdatebr FROM things WHERE tstatus = 'on' ORDER BY tdate DESC";
       const [rows] = await conn.query(sql);
 
       // View dos dados.
       res.json({ data: rows });
 
-      }
-      catch(error){
+    }
+    catch (error) {
 
-        // Exibe mensagem de erro.
+      // Exibe mensagem de erro.
       res.json({ status: "error", message: error });
 
-      }
-      
-    },
-    getOne: async (req, res) => {
-      try {
+    }
 
-        // Id da requisição
-        const id = req.params.id;
-  
-        const sql = "SELECT *, DATE_FORMAT(tdate, '%d/%m/%Y às %H:%i') AS tdatebr FROM things WHERE tid = ? AND tstatus = 'on' ORDER BY tdate DESC";
-        const [rows] = await conn.query(sql, [id]);
-  
-        // View dos dados.
-        res.json({ coisa: rows });
-  
-      } catch (error) {
-  
-        // Exibe mensagem de erro.
-        res.json({ status: "error", message: error });
-  
-      }
-    },
-    post: async (req, res) => {
-      
-      try {
+  },
 
-        // Extrai os campos do req.body.
-        const { user, name, photo, description, location, options } = req.body;
-  
-        // Query.
-        const sql = "INSERT INTO things (tuser, tname, tphoto, tdescription, tlocation, toptions) VALUES (?, ?, ?, ?, ?, ?)";
-        const [rows] = await conn.query(sql, [user, name, photo, description, location, options]);
-  
-        // View dos dados.
-        res.json({ coisa: rows.insertId, status: "sucess" });
-  
-      } catch (error) {
-  
-        // Exibe mensagem de erro.
-        res.json({ status: "error", message: error });
-  
-      }
-     },
+  getOne: async (req, res) => {
 
-    put: async (req, res) => {
-      try{
-        
-      }catch(error){}
-    },
+    try {
 
-    delete: async (req, res) => {
-        const id = req.params.id;
-        res.json({ "req": req.method, "id": req.params.id, "status": "ok" });;
-     }
+      // Id da requisição.
+      const id = req.params.id;
+
+      // Executa query que obtem um registro único.
+      const sql = "SELECT *, DATE_FORMAT(tdate, '%d/%m/%Y às %H:%i') AS tdatebr FROM things WHERE tid = ? AND tstatus = 'on' ORDER BY tdate DESC";
+      const [rows] = await conn.query(sql, [id]);
+
+      // View dos dados.
+      res.json({ coisa: rows });
+
+    } catch (error) {
+
+      // Exibe mensagem de erro.
+      res.json({ status: "error", message: error });
+
+    }
+
+  },
+
+  post: async (req, res) => {
+
+    try {
+
+      // Extrai os campos do req.body.
+      const { user, name, photo, description, location, options } = req.body;
+
+      //////////////////////////////////////////////
+      // A validação dos dados será feita aqui!!! //
+      //////////////////////////////////////////////
+
+      // Executa query de inserção do registro.
+      const sql = "INSERT INTO things (tuser, tname, tphoto, tdescription, tlocation, toptions) VALUES (?, ?, ?, ?, ?, ?)";
+      const [rows] = await conn.query(sql, [user, name, photo, description, location, options]);
+
+      // View do feedback.
+      res.json({ id: rows.insertId, status: "success" });
+
+    } catch (error) {
+
+      // Exibe mensagem de erro.
+      res.json({ status: "error", message: error });
+
+    }
+
+  },
+
+  put: async (req, res) => {
+
+    try {
+
+      // Id da requisição.
+      const id = req.params.id;
+
+      // Extrai os campos do req.body.
+      const { user, name, photo, description, location, options } = req.body;
+
+      //////////////////////////////////////////////
+      // A validação dos dados será feita aqui!!! //
+      //////////////////////////////////////////////
+
+      // Executa query de atualização do registro.
+      const sql = "UPDATE things SET tuser = ?, tname = ?, tphoto = ?, tdescription = ?, tlocation = ?, toptions = ? WHERE tid = ? AND tstatus = 'on'";
+      const [rows] = await conn.query(sql, [user, name, photo, description, location, options, id]);
+
+      // View do feedback.
+      res.json({ id: id, status: "success" });
+
+    } catch (error) {
+
+      // Exibe mensagem de erro.
+      res.json({ status: "error", message: error });
+
+    }
+
+  },
+
+  delete: async (req, res) => {
+
+    try {
+
+      // Id da requisição
+      const id = req.params.id;
+
+      //////////////////////////////////////////////
+      // A confirmação da ação será feita aqui!!! //
+      //////////////////////////////////////////////
+
+      // Executa query de atualização do status do registro.
+      const sql = "UPDATE things SET tstatus = 'del' WHERE tid = ?";
+      const [rows] = await conn.query(sql, [id]);
+
+      // View do feedback.
+      res.json({ id: id, status: "success" });
+
+    } catch (error) {
+
+      // Exibe mensagem de erro.
+      res.json({ status: "error", message: error });
+
+    }
+
   }
 
-  // Objeto que trata requisições para o 'user'.
+}
+
+// Objeto que trata requisições para o 'user'.
 const user = {
-    getOne: async (req, res) => { },
-    post: async (req, res) => { },
-    put: async (req, res) => { },
-    delete: async (req, res) => { }
-  }
+  getOne: async (req, res) => { },
+  post: async (req, res) => { },
+  put: async (req, res) => { },
+  delete: async (req, res) => { }
+}
 
-// Recebe os dados do body HTTP e valida em JSON.
+// Recebe os dados do body HTTP e valida em JSON → POST e PUT.
 const bodyParser = require('body-parser').json();
 
 // Rota para GET → getAll() → Recebe, por exemplo, todos os registros.
@@ -116,7 +170,7 @@ app.get('/', thing.getAll);
 // Rota para GET → get(id) → Recebe apenas o registro identificado.
 app.get('/:id', thing.getOne);
 
-//Rota para DELETE.
+// Rota para DELETE.
 app.delete('/:id', thing.delete);
 
 // Rota para POST → bodyParser (no hook) é usado para garantir a chegada de um JSON.
@@ -125,14 +179,11 @@ app.post('/', bodyParser, thing.post);
 // Rota para PUT → bodyParser (no hook) é usado para garantir a chegada de um JSON.
 app.put('/:id', bodyParser, thing.put);
 
-//Rotas para o usuário
+// Rotas para o ususário
 app.get('/user/:id', user.getOne);
-app.get('/user/:id', user.put);
-app.get('/user/:id', user.delete);
+app.put('/user/:id', user.put);
+app.delete('/user/:id', user.delete);
 
-//Comentátio aqui
 app.listen(port, () => {
-
-    //Comentátio aqui
-    console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`)
 })
