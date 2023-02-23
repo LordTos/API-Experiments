@@ -4,7 +4,7 @@
  */
 
 // Importa conector do banco de dados.
-const conn = require('../model/index');
+const conn = require('../model/mysql');
 
 // Objeto "controller" para a entidade "things" do banco de dados.
 const thingControl = {
